@@ -8,6 +8,7 @@ class Author
   end
 
   def can_meet? other_author
-
+  		range = @year_of_birth.to_i..@year_of_death.to_i
+      	range.include?(other_author.year_of_birth.to_i)||range.include?(other_author.year_of_death.to_i)
   end
 end
