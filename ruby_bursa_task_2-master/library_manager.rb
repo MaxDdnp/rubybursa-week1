@@ -16,10 +16,6 @@ class LibraryManager
     @issue_datetime = issue_datetime
   end
 
-  def dateTimeParser(dateTimeVal)
-      parsedDateTime = DateTime.parse(dateTimeVal).new_offset(0)
-  end
-
   def dateTimeNow
       DateTime.now.new_offset(0)
   end
@@ -81,7 +77,7 @@ class LibraryManager
   def penalty_to_finish
       timeOld = issue_datetime
       timeNow = dateTimeNow
-      timeToFullyRead = timeNow + (@reader_with_book.time_to_finish/24.0)
+      timeToFullyRead = timeNow + (reader_with_book.time_to_finish/24.0)
       bill = 0
      if timeToFullyRead > timeOld 
         bill = (timeToFullyRead - timeOld).to_i * 24 * centsPerHour() 
@@ -91,27 +87,19 @@ class LibraryManager
 
   def email_notification_params
       {
-        name:    "#{@reader_with_book.name}",
-        book:    "#{@reader_with_book.book.title}",
-        author:  "#{@reader_with_book.book.author}",
+        name:    "#{reader_with_book.name}",
+        book:    "#{reader_with_book.book.title}",
+        author:  "#{reader_with_book.book.author}",
         penalty_per_hour:  "#{centsPerHour()}",
-        penalty:           "#{penalty()}",
-        hours_to_deadline: "#{(self.dateTimeParser(issue_datetime) - self.dateTimeNow).round * 24}"
+        hours_to_deadline: "#{(issue_datetime - self.dateTimeNow).round * 24}"
       }
   end
 
   def email_notification
-    <<-TEXT
+    <<-TEXT 
       Hello, #{email_notification_params[:name]}!\n
-      #{ if email_notification_params[:hours_to_deadline].to_i <= 0
-            "You must return the book \"#{email_notification_params[:book]}\" authored by #{email_notification_params[:author]} as soon as possible!\n
-      You already owe the library $#{sprintf('%.2f', email_notification_params[:penalty].to_f / 100.0)} (¢#{email_notification_params[:penalty]}) and you are charged ¢#{email_notification_params[:penalty_per_hour]} every hour.\n
-      Your overdue for the moment is #{-email_notification_params[:hours_to_deadline].to_i} hours."
-         else 
-            "You should return the book \"#{email_notification_params[:book]}\" authored by #{email_notification_params[:author]} in #{email_notification_params[:hours_to_deadline]} hours.\n
-      Otherwise you will be charged ¢#{email_notification_params[:penalty_per_hour]} per hour."
-         end
-      }
+      "You must return the book \"#{email_notification_params[:book]}\" authored by #{email_notification_params[:author]} in #{email_notification_params[:hours_to_deadline].to_i}.\n
+      Otherwise you will be charged \$#{email_notification_params[:penalty_per_hour]}.
     TEXT
   end
 
