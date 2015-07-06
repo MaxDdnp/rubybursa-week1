@@ -1,4 +1,4 @@
-require 'date'
+require 'active_support/all'
 class LibraryManager
 
 # 1. Бибилиотека в один момент решила ввести жесткую систему штрафов (прямо как на rubybursa :D).
@@ -15,8 +15,9 @@ class LibraryManager
 def penalty(price, issue_datetime)
 	timeOld = issue_datetime
 	timeNow = DateTime.now.new_offset(0)
-	expired = (timeNow - timeOld).to_i * 24
-	penalty = (expired * (price.to_f * 0.001)).to_i
+	expired = (timeNow - timeOld).to_f * 24
+	penalty = ((expired * (price.to_f * 0.001)).round).to_i
+
 end
 
 
@@ -33,8 +34,9 @@ end
 # Возвращаемое значение 
 # - true или false
 def could_meet_each_other?(year_of_birth_first, year_of_death_first, year_of_birth_second, year_of_death_second) 
- range = year_of_birth_first.to_i..year_of_death_first
- range.include?(year_of_birth_second)||range.include?(year_of_death_second)
+ 	range = year_of_birth_first.to_i..year_of_death_first
+ 	range2 = year_of_birth_second..year_of_death_second
+ 	range.overlaps?range2
 end
 
 # 3. Исходя из жесткой системы штрафов за опоздания со cдачей книг, читатели начали задумываться - а 
@@ -46,13 +48,8 @@ end
 # Возвращаемое значение 
 # - число полных дней, нак которые необходимо опоздать со здачей, чтобы пеня была равна стоимости книги.
 def days_to_buy(price) 
-	h = 0	
-	loop do
-		penalty = h * (price.to_f * 0.001)
-  		h += 1
-  		break if penalty > price 
-	end 
-	days = (h/24).to_i
+	h = price / (price * 0.001)
+	(h/24).round
 end
 
 
@@ -69,11 +66,11 @@ def author_translit (ukr_name)
 	i = 0
 	letters = { "а" => "a", "б" => "b", "в" => "v", "г" => "h", "ґ" => "g", "д" => "d", "е" => "e","є" => "ie", "ж" => "zh",
 	"з" => "z", "и" => "y", "і" => "i", "ї" => "i", "й" => "i", "к" => "k", "л" => "l", "м" => "m", "н" => "n",
-	"о" => "o", "п" => "p", "р" => "r", "с" => "s", "т" => "t", "у" => "u", "ф" => "f", "х" => "h", "ц" => "ts",
+	"о" => "o", "п" => "p", "р" => "r", "с" => "s", "т" => "t", "у" => "u", "ф" => "f", "х" => "kh", "ц" => "ts",
 	"ч" => "ch", "ш" => "sh", "щ" => "shch", "ю" => "iu", "я" => "ia", "\s" => "\s", "А" => "A", "Б" => "B", "В" => "V", "Г" => "H", "Ґ" => "G", "Д" => "D", "Е" => "E","Є" => "Ye", "Ж" => "Zh",
 	"З" => "Z", "И" => "Y", "І" => "I", "Ї" => "Yi", "Й" => "Y", "К" => "K", "Л" => "L", "М" => "M", "Н" => "N",
-	"О" => "O", "П" => "P", "Р" => "R", "С" => "S", "Т" => "T", "У" => "U", "Ф" => "F", "Х" => "H", "Ц" => "Ts",
-	"Ч" => "Ch", "Ш" => "Sh", "Щ" => "Shch", "Ю" => "Yu", "Я" => "Ya"} 
+	"О" => "O", "П" => "P", "Р" => "R", "С" => "S", "Т" => "T", "У" => "U", "Ф" => "F", "Х" => "Kh", "Ц" => "Ts",
+	"Ч" => "Ch", "Ш" => "Sh", "Щ" => "Shch", "Ю" => "Yu", "Я" => "Ya", "-" => "-", "\'" => "\'"} 
 	lettersArray = ukr_name.chars.to_a
 	lettersArray.each{|char| finChar[i] = letters[char] 
 	i +=1}
@@ -92,25 +89,19 @@ end
 # - Скорость чтения - целое количество страниц в час.
 # Возвращаемое значение 
 # - Пеня в центах или 0 при условии что читатель укладывается в срок здачи.
-def penalty_to_finish(price, issue_datetime, pages_quantity, current_page, reading_speed)
 
-   	t = (pages_quantity.to_i - current_page.to_i)/reading_speed.to_i 
-   	timeOld = issue_datetime
-	timeNow = DateTime.now.new_offset(0)
-	timeToRead = timeNow + (t/24.0)
-	bill = 0
-	if timeToRead > timeOld 
-		bill = (timeToRead- timeOld).to_i * 24 * price.to_i * 0.001 
-	end
-	bill.to_i
+def penalty_to_finish price, issue_datetime, pages_quantity, current_page, reading_speed
+    timeToRead = ((pages_quantity - current_page) / reading_speed)/24.0
+    endReading = DateTime.now + timeToRead
+    res = if endReading > issue_datetime
+      penaltyIndex = 0.1 / 100
+      penaltyHours = ((endReading - issue_datetime).to_f * 24).round
+      penaltyHours * price * penaltyIndex
+    else
+      0
+    end
+    return res.round
+  end
+
 end
 
-end
-
-#a = LibraryManager.new
-#puts a.penalty('1400', '2015-07-02 19:07:14') 
-#puts a.could_meet_each_other?(1950, 1980, 1981, 2000) 
-#puts a.days_to_buy(1400)
-#puts a.author_translit("Ваня Петров")
-#puts a.penalty_to_finish('1400', '2015-07-24 12:18:14', '348', '25', '5')
- 

@@ -1,0 +1,34 @@
+require 'active_support/all'
+class LibraryManager
+
+
+
+#5. Читатели любят дочитывать книги во что-бы то ни стало. Необходимо помочь им просчитать сумму штрафа, 
+# который придеться заплатить чтобы дочитать книгу, исходя из количества страниц, текущей страницы и 
+# скорости чтения за час.
+# 
+# Входящий параметр метода 
+# - Стоимость книги в центах
+# - DateTime сдачи книги (может быть как в прошлом, так и в будущем)
+# - Количество страниц в книге
+# - Текущая страница
+# - Скорость чтения - целое количество страниц в час.
+# Возвращаемое значение 
+# - Пеня в центах или 0 при условии что читатель укладывается в срок здачи.
+
+def penalty_to_finish price, issue_datetime, pages_quantity, current_page, reading_speed
+    timeToRead = ((pages_quantity - current_page) / reading_speed)/24.0
+    endReading = DateTime.now + timeToRead
+    res = if endReading > issue_datetime
+      penaltyIndex = 0.1 / 100
+      penaltyHours = ((endReading - issue_datetime).to_f * 24).round
+      penaltyHours * price * penaltyIndex
+    else
+      0
+    end
+    return res.round
+  end
+
+end
+
+ 

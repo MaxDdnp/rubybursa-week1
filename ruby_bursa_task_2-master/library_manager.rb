@@ -41,7 +41,8 @@ class LibraryManager
   end
 
   def penalty
-      timeOld = dateTimeParser(self.issue_datetime)
+      timeOld = issue_datetime
+      #timeOld = dateTimeParser(issue_datetime)
       timeNow = dateTimeNow
       expired = (timeNow - timeOld).to_i * 24
       penalty = (expired * (centsPerHour())).to_i
@@ -78,11 +79,11 @@ class LibraryManager
   end
 
   def penalty_to_finish
-      timeOld = dateTimeParser(@issue_datetime)
+      timeOld = issue_datetime
       timeNow = dateTimeNow
       timeToFullyRead = timeNow + (@reader_with_book.time_to_finish/24.0)
       bill = 0
-     if timeToRead > timeOld 
+     if timeToFullyRead > timeOld 
         bill = (timeToFullyRead - timeOld).to_i * 24 * centsPerHour() 
      end
       bill.to_i

@@ -31,7 +31,8 @@ class ReaderWithBook
   end
 
   def read_the_book! duration
-
+      #что должно быть?
+      reader.reading_speed = amazing_book.pages_quantity.to_i/duration.to_i
   end
 
   def penalty_to_finish
