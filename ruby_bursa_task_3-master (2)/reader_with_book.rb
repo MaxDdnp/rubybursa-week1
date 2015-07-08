@@ -13,11 +13,11 @@ class ReaderWithBook
   end
 
   def reading_hours
-      (current_page.to_f / reader.reading_speed).round(2)
+    (current_page.to_f / reader.reading_speed).round(2)
   end
 
   def time_to_finish
-      (amazing_book.pages_quantity - current_page) / reading_speed
+    (amazing_book.pages_quantity - current_page) / reading_speed
   end
 
   def penalty
@@ -29,28 +29,15 @@ class ReaderWithBook
   end
 
   def days_to_buy
-      h = 0 
-      loop do
-        penalty = h * (amazing_book.penalty_per_hour())
-        break if penalty > amazing_book.price() 
-        h += 1
-      end 
-      days = (h/24).to_i
+
   end
 
   def read_the_book! duration
-      self.current_page = current_page + duration * reader.reading_speed
+    self.current_page = current_page + duration * reader.reading_speed
   end
 
   def penalty_to_finish
-      timeOld = dateTimeParser(@issue_datetime)
-      timeNow = dateTimeNow
-      timeToFullyRead = timeNow + (@reader_with_book.time_to_finish/24.0)
-      bill = 0
-     if timeToRead > timeOld 
-        bill = (timeToFullyRead - timeOld).to_i * 24 * centsPerHour() 
-     end
-      bill.to_i
+
   end
 
 end

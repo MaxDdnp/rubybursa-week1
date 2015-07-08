@@ -9,7 +9,7 @@ class PublishedBook < Book
   end
 
   def age
-    age = Time.now.year - published_at + 1
+    Time.now.year - published_at
   end
 
   def penalty_per_hour
