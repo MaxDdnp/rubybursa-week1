@@ -2,6 +2,15 @@ require './library_manager.rb'
 
 describe LibraryManager do
 
+let(:leo_tolstoy) do
+    Author.new(1828, 1910, 'Leo Tolstoy' ) 
+  end
+  let!(:oscar_wilde) { Author.new(1854, 1900, 'Oscar Wilde') }
+  let!(:war_and_peace) { PublishedBook.new(leo_tolstoy, 'War and Peace', 1400, 3280, 1996) }
+  let!(:ivan) {Reader.new('Ivan Testenko', 16)}
+  let!(:ivan_testenko) { ReaderWithBook.new(war_and_peace, ivan, 328, (DateTime.now.new_offset(0) + 2.days)) }
+  let!(:manager) { LibraryManager.new([],[], [ivan_testenko]) }
+
   it 'should compose reader notification' do
     expect(manager.reader_notification("Ivan Testenko")). to eq <<-TEXT
 Dear Ivan Testenko!

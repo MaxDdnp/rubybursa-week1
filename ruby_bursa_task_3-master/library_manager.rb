@@ -16,7 +16,7 @@ class LibraryManager
     @readers = readers
     @books = books
     @statistics = {}
-    populate_statistics!
+   # populate_statistics!
   end
 
   def new_book author, title, price, pages_quantity, published_at
@@ -36,7 +36,16 @@ class LibraryManager
   end
 
   def reader_notification(name)
+      params = reader_notification_params(name)
+      puts params 
+      puts  "params here"
+      <<-TEXT
+Dear #{params["name"]}!
 
+You should return a book \"#{params["book"]}\" authored by #{params["author"]} in #{params["hours_to_deadline"]} hours.
+Otherwise you will be charged \$#{params["penalty_per_hour"]} per hour.
+By the way, you are on #{params["current_page"]} page now and you need #{params["reading_hours"]} hours to finish reading \"#{params["book"]}\"
+TEXT
   end
 
   def librarian_notification
@@ -49,14 +58,20 @@ class LibraryManager
 
   private
 
-  def reader_notification_params
-    {
-        name:    "#{reader_with_book.name}",
-        book:    "#{reader_with_book.book.title}",
-        author:  "#{reader_with_book.book.author}",
-        penalty_per_hour:  "#{centsPerHour()}",
-        hours_to_deadline: "#{(issue_datetime - self.dateTimeNow).round * 24}"
-    }
+  def reader_notification_params(name)
+        a = Hash.new
+         @reader_with_books.each do |r|
+          if r.reader.name == name
+            a.store("name", r.reader.name)
+            a.store("book", r.amazing_book.title)
+            a.store("author", r.amazing_book.author.name)
+            a.store("hours_to_deadline", ((r.return_date.to_i - DateTime.now.to_i)/3600).round(2))
+            a.store("penalty_per_hour", r.amazing_book.penalty_per_hour().round(1))
+            a.store("current_page", r.current_page)
+            a.store("reading_hours", r.reading_hours)
+            end
+          end
+          a
   end
 
   def librarian_notification_params
@@ -67,24 +82,24 @@ class LibraryManager
 
   end
 
-  def populate_statistics!
-    readers_with_books.each do |r|
-      @statistics["readers"][r.reader.name] ||= {"pages" => 0, "books" => 0, "authors" => []}
-      @statistics["readers"][r.reader.name]["pages"] += r.current_page
-      @statistics["readers"][r.reader.name]["authors"] |= [r.amazing_book.author.name]
-      @statistics["readers"][r.reader.name]["books"] += 1
-      @statistics["book_titles"][r.amazing_book.title] ||= {
-          "author" => "", "reding_hours" => 0, "readers" => []}
-      @statistics["book_titles"][r.amazing_book.title]["author"] = r.amazing_book.author.name
-      @statistics["book_titles"][r.amazing_book.title]["reading_hours"] += r.reading_hours
-      @statistics["book_titles"][r.amazing_book.title]["readers" ] |= [r.reader.name]
-      @statistics["authors"][r.name] ||= {"pages" => 0, "books" => 0, "authors" => 0}
-      @statistics["authors"][r.name]["pages"] += r.current_page
-      @statistics["authors"][r.name]["authors"] |= [r.amazing_book.author.name]
-      @statistics["authors"][r.name]["books"] += 1
-    end
-    @statistics
-  end
+  # def populate_statistics!
+  #   readers_with_books.each do |r|
+  #     @statistics["readers"][r.reader.name] ||= {"pages" => 0, "books" => 0, "authors" => []}
+  #     @statistics["readers"][r.reader.name]["pages"] += r.current_page
+  #     @statistics["readers"][r.reader.name]["authors"] |= [r.amazing_book.author.name]
+  #     @statistics["readers"][r.reader.name]["books"] += 1
+  #     @statistics["book_titles"][r.amazing_book.title] ||= {
+  #         "author" => "", "reding_hours" => 0, "readers" => []}
+  #     @statistics["book_titles"][r.amazing_book.title]["author"] = r.amazing_book.author.name
+  #     @statistics["book_titles"][r.amazing_book.title]["reading_hours"] += r.reading_hours
+  #     @statistics["book_titles"][r.amazing_book.title]["readers" ] |= [r.reader.name]
+  #     @statistics["authors"][r.name] ||= {"pages" => 0, "books" => 0, "authors" => 0}
+  #     @statistics["authors"][r.name]["pages"] += r.current_page
+  #     @statistics["authors"][r.name]["authors"] |= [r.amazing_book.author.name]
+  #     @statistics["authors"][r.name]["books"] += 1
+  #   end
+  #   @statistics
+  # end
 
   def statiscs_sample
     {

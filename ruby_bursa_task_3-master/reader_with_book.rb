@@ -1,7 +1,7 @@
 class ReaderWithBook
   attr_accessor :amazing_book, :current_page, :reader, :return_date
 
-  def initialize  amazing_book, reader, current_page = 0, return_date = (Time.now + 2.weeks)
+  def initialize  amazing_book, reader, current_page = 0, return_date = (DateTime.now.new_offset(0) + 2)
     @amazing_book = amazing_book
     @reader = reader
     @return_date = return_date
@@ -25,10 +25,10 @@ class ReaderWithBook
   end
 
   def hours_overdue
-    (Time.now.to_i - issue_datetime.to_time.to_i) / 3600.0
+    (DateTime.now.to_i - issue_datetime.to_time.to_i) / 3600.0#&&&&&&&&&&&&&&&&&&
   end
 
-  def days_to_buy
+  def days_to_buy 
       h = 0 
       loop do
         penalty = h * (amazing_book.penalty_per_hour())
