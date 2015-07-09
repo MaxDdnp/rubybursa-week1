@@ -12,9 +12,9 @@ class LibraryManager
   attr_accessor :readers, :books, :readers_with_books
 
   def initialize readers = [], books = [], readers_with_books = []
-    @reader_with_books = readers_with_books
     @readers = readers
     @books = books
+    @reader_with_books = readers_with_books
     @statistics = {}
    # populate_statistics!
   end
@@ -37,8 +37,6 @@ class LibraryManager
 
   def reader_notification(name)
       params = reader_notification_params(name)
-      puts params 
-      puts  "params here"
       <<-TEXT
 Dear #{params["name"]}!
 
@@ -49,7 +47,15 @@ TEXT
   end
 
   def librarian_notification
-
+      <<-TEXT
+        Hello,\n
+        There are #{librarian_notification_params[:number_of_books]} published books in the library.\n
+        There are #{librarian_notification_params[:number_of_readers]} readers and #{librarian_notification_params[:number_of_readers_with_book]} of them are reading the books.\n
+      TEXT
+    @reader_with_books.each do |r|
+      puts (r.reader.name.to_s +  " is reading \"" + r.amazing_book.title + "\" - should return on " + r.return_date.strftime("%Y/%m/%d at %I:%M%p").to_s + " - " + r.time_to_finish.round(2).to_s + " hours of reading is needed to finish.")
+    end 
+      
   end
 
   def statistics_notification
@@ -75,7 +81,7 @@ TEXT
   end
 
   def librarian_notification_params
-
+      { :number_of_books => "#{@books.length}", :number_of_readers => "#{@readers.length}", :number_of_readers_with_book => "#{@reader_with_books.length}"}
   end
 
   def statistics_notification_params

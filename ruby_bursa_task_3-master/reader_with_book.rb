@@ -17,7 +17,7 @@ class ReaderWithBook
   end
 
   def time_to_finish
-      (amazing_book.pages_quantity - current_page) / reading_speed
+      (amazing_book.pages_quantity - current_page) / reader.reading_speed
   end
 
   def penalty
