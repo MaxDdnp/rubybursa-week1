@@ -25,7 +25,7 @@ class ReaderWithBook
   end
 
   def hours_overdue
-    (DateTime.now.to_i - issue_datetime.to_time.to_i) / 3600.0#&&&&&&&&&&&&&&&&&&
+    (DateTime.now.to_i - issue_datetime.to_time.to_i) / 3600.0
   end
 
   def days_to_buy 
@@ -39,7 +39,11 @@ class ReaderWithBook
   end
 
   def read_the_book! duration
-      self.current_page = current_page + duration * reader.reading_speed
+      if time_to_finish > duration
+      self.current_page = current_page + reader.reading_speed * duration
+    else
+      self.current_page = amazing_book.pages_quantity
+    end
   end
 
   def penalty_to_finish

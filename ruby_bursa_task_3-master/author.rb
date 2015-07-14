@@ -6,5 +6,4 @@ class Author
     @year_of_death = year_of_death
     @name = name
   end
-  
 end
