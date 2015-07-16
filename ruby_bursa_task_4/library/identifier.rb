@@ -1,6 +1,6 @@
 module Library
   module Identifier
-  	@@group_identifier = 0
+  	#@@group_identifier = 0
 
   	def self.included(base)
       base.send :extend, ClassMethods
