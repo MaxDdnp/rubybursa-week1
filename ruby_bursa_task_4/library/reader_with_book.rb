@@ -1,17 +1,12 @@
-module Library
-class ReaderWithBook
-  attr_accessor :amazing_book, :current_page, :reader, :return_date, :comments_counter
-      @@comments_counter = 0
-      @comments = []
+class Library::ReaderWithBook
+  include Library::Commentable
+  
+  attr_accessor :amazing_book, :current_page, :reader, :return_date
   def initialize  amazing_book, reader, current_page = 0, return_date = (DateTime.now.new_offset(0) + 2)
     @amazing_book = amazing_book
     @reader = reader
     @return_date = return_date
     @current_page = current_page
-  end
-
-  def self.comments_quantity
-    comments_counter
   end
 
   def self.find_reader_and_update_current_page array, name, duration
@@ -63,15 +58,4 @@ class ReaderWithBook
       bill.to_i
   end
 
-  def add_comment(comment)
-        comments << comment
-        Library::ReaderWithBook.comments_counter+=1
-        Library::Commentable.total_comments_counter+=1
-  end
-
-  def comments
-        comments
-  end
-
-end
 end

@@ -1,27 +1,13 @@
-module Library
-    class PublishedBook < Book
-      attr_accessor :price, :pages_quantity, :published_at, :comments_counter
-      @@comments_counter = 0
-      @comments = []
+class Library::PublishedBook < Library::Book
+      include Library::Commentable
+      include Library::Identifier
+
+      attr_accessor :price, :pages_quantity, :published_at
       def initialize author, title, price, pages_quantity, published_at
         @price = price
         @pages_quantity = pages_quantity
         @published_at = published_at
         super author, title
-      end
-
-      def self.comments_quantity
-        comments_counter
-      end
-
-      def add_comment(comment)
-        comments << comment
-        Library::PublishedBook.comments_counter+=1
-        Library::Commentable.total_comments_counter+=1
-      end
-
-      def comments
-        comments
       end
 
       def age
@@ -35,6 +21,4 @@ module Library
 
         price_penalty + pages_penalty + age_penalty
       end
-
-    end
 end

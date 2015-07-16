@@ -1,13 +1,4 @@
-require 'active_support/all'
-require 'pry'
-
-require_relative 'author.rb'
-require_relative 'book.rb'
-require_relative 'published_book.rb'
-require_relative 'reader.rb'
-require_relative 'reader_with_book.rb'
-module Library
-class Manager
+class Library::Manager
 
   attr_accessor :readers, :books, :readers_with_books
 
@@ -178,34 +169,4 @@ TEXT
   def statistics_sample
     {'authors' => {},'readers' => {}, 'book_titles' => {} }
   end
-
-
-  module Commentable
-    attr_accessor :@@total_comments_counter
-    def initialize total_comments_counter = 0
-      @@total_comments_counter = total_comments_counter
-    end
-    
-    def self.total_comments_quantity
-      total_comments_counter
-    end
-  end
 end
-end
-
-
-
-
-
-
-leo_tolstoy=Author.new(1828, 1910, 'Leo Tolstoy') 
-oscar_wilde=Author.new(1854, 1900, 'Oscar Wilde') 
-war_and_peace=PublishedBook.new(leo_tolstoy, 'War and Peace', 1400, 3280, 1996)
-portait=PublishedBook.new(oscar_wilde, 'Portrait of Dorian Grey', 1200, 800, 2012)
-ivan=Reader.new('Ivan Testenko', 16)
-obama=Reader.new('Barak Obama', 20)
-ivan_testenko=ReaderWithBook.new(war_and_peace, ivan, 328, (DateTime.now.new_offset(0) + 2.days)) 
-manager=LibraryManager.new([obama], [portait], [ivan_testenko])
-puts manager.reader_notification(ivan.name)
-puts manager.librarian_notification
-puts manager.statistics_notification
